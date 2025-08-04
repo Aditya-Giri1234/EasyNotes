@@ -38,6 +38,7 @@ fun NotesGrid(
     isDeleteClicked: Boolean,
     animationFinished: (Int) -> Unit
 ) {
+    //It return pair where each item is list. It just device list based on passing predicate logic.
     val (pinnedNotes, otherNotes) = notes.partition { it.pinned }
 
     @Composable

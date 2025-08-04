@@ -45,6 +45,7 @@ fun defaultScreenExitAnimation(): ExitTransition {
             )
 }
 
+//New Screen Come from right to left
 fun slideScreenEnterAnimation(): EnterTransition {
     return slideInHorizontally(
         initialOffsetX = { fullWidth -> fullWidth },
@@ -52,6 +53,7 @@ fun slideScreenEnterAnimation(): EnterTransition {
     )
 }
 
+// Now  current screen remove from center to right way
 fun slideScreenExitAnimation(): ExitTransition {
     return slideOutHorizontally(
         targetOffsetX = { fullWidth -> fullWidth },

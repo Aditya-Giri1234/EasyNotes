@@ -63,4 +63,5 @@ class SettingsUseCase @Inject constructor(
             else -> throw IllegalArgumentException("Unsupported setting type: ${settingValue?.javaClass}")
         }
     }
+
 }

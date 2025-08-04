@@ -32,6 +32,7 @@ fun AppNavHost(settingsModel: SettingsViewModel,navController: NavHostController
     val activity = (LocalContext.current as? Activity)
     val startRoute = if (defaultRoute != NavRoutes.LockScreen.route && noteId != -1) NavRoutes.Edit.route else defaultRoute
 
+    //Used older url based routing
     NavHost(navController, startDestination = startRoute) {
         animatedComposable(NavRoutes.Home.route) {
             HomeView(
@@ -87,6 +88,7 @@ fun AppNavHost(settingsModel: SettingsViewModel,navController: NavHostController
             }
         }
 
+        //Here based on current setting nested screen animation change between slide or normal(left or right) animation
         settingScreens.forEach { (route, screen) ->
             if (route == NavRoutes.Settings.route) {
                 slideInComposable(route) {
