@@ -74,6 +74,8 @@ fun NotesGrid(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         content = {
             if (pinnedNotes.isNotEmpty()) {
+                //We can also do this.
+//                item(span = { GridItemSpan(maxLineSpan) })
                 item(span = StaggeredGridItemSpan.FullLine) {
                     Text(
                         modifier = Modifier.padding(bottom = 16.dp),
