@@ -31,6 +31,7 @@ class CodeBlockProcessor : MarkdownLineProcessor {
 }
 
 class CheckboxProcessor : MarkdownLineProcessor {
+    //This regex say match starting from string which have [] and inside only space or x or X allowed and after square bracket anything can come.
     override fun canProcessLine(line: String): Boolean = line.matches(Regex("^\\[[ xX]]( .*)?"))
 
     override fun processLine(line: String, builder: MarkdownBuilder) {

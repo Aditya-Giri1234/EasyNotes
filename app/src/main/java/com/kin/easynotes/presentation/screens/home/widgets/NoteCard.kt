@@ -36,6 +36,7 @@ fun NoteCard(
     onLongClick: () -> Unit,
     onNoteUpdate: (Note) -> Unit
 ) {
+    //This is called modifier extraction pattern.
     val borderModifier = if (isBorderEnabled) {
         Modifier.border(
             width = 1.5.dp,
@@ -55,6 +56,7 @@ fun NoteCard(
         modifier = Modifier
             .padding(bottom = 12.dp)
             .clip(shape)
+            // This is useful when we apply combine clicking logic.
             .combinedClickable(
                 onClick = { onShortClick() },
                 onLongClick = { onLongClick() }

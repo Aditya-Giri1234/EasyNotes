@@ -114,6 +114,7 @@ private fun rememberTransitionState(): MutableTransitionState<Boolean> {
     return remember { MutableTransitionState(false).apply { targetState = true } }
 }
 
+//Handle based on is user in selection mode or not.
 private fun handleShortClick(
     selectedNotes: MutableList<Note>,
     note: Note,
@@ -129,7 +130,7 @@ private fun handleShortClick(
         onNoteClicked(note.id)
     }
 }
-
+//If user is not in selection mode then go into selection mode.
 private fun handleLongClick(selectedNotes: MutableList<Note>, note: Note) {
     if (!selectedNotes.contains(note)) {
         selectedNotes.add(note)
