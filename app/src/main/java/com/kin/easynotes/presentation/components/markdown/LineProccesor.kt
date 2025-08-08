@@ -12,7 +12,7 @@ class CodeBlockProcessor : MarkdownLineProcessor {
 
     override fun processLine(line: String, builder: MarkdownBuilder) {
         val codeBlock = StringBuilder()
-        var index = builder.lineIndex + 1
+        var index = builder.lineIndex + 1 // start with first index because 0th have ```
         var isEnded = false
 
         while (index < builder.lines.size) {
@@ -49,6 +49,17 @@ class HeadingProcessor : MarkdownLineProcessor {
         val level = line.takeWhile { it == '#' }.length
         val text = line.drop(level).trim()
         builder.add(Heading(level, text))
+    }
+}
+
+class StrikeThroughProcessor : MarkdownLineProcessor {
+    override fun canProcessLine(line: String): Boolean = line.startsWith("~~")&&line.endsWith("~~")
+
+    override fun processLine(line: String, builder: MarkdownBuilder) {
+        val levelStart = line.takeWhile { it == '~' }.length
+        val levelEnd = line.takeLastWhile { it == '~' }.length
+        val text = line.drop(levelStart).dropLast(levelEnd).trim()
+        builder.add(StrikeThroughCustom(text))
     }
 }
 

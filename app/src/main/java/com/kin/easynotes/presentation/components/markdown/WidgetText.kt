@@ -264,6 +264,7 @@ fun WidgetMarkdownElement(
             }
 
             is HorizontalRule -> TODO()
+            is StrikeThroughCustom -> TODO()
         }
     }
 }

@@ -1,6 +1,8 @@
 package com.kin.easynotes.presentation.components.markdown
 
 
+import android.content.Intent
+import android.net.Uri
 import android.text.SpannableString
 import android.widget.TextView
 import androidx.compose.foundation.background
@@ -33,10 +35,12 @@ import androidx.compose.ui.graphics.ColorProducer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -139,7 +143,8 @@ fun MarkdownText(
         ImageInsertionProcessor(),
         CheckboxProcessor(),
         LinkProcessor(),
-        HorizontalRuleProcessor()
+        HorizontalRuleProcessor() ,
+        StrikeThroughProcessor()
     )
     val markdownBuilder = MarkdownBuilder(lines, lineProcessors)
     markdownBuilder.parse()
@@ -186,7 +191,7 @@ fun MarkdownContent(
 ) {
     if (isPreview) {
         Column(modifier = modifier) {
-             content.take(4).forEachIndexed { index, _ ->
+             content.forEachIndexed { index, _ ->
                     RenderMarkdownElement(
                         radius = radius,
                         index = index,
@@ -354,12 +359,12 @@ fun RenderMarkdownElement(
                     onClick = { offset: Int ->
                         annotatedString.getStringAnnotations("URL", offset, offset)
                             .firstOrNull()?.let { annotation ->
-                                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW)
-                                intent.data = android.net.Uri.parse(annotation.item)
+                                val intent = Intent(Intent.ACTION_VIEW)
+                                intent.data = Uri.parse(annotation.item)
                                 context.startActivity(intent)
                             }
                     },
-                    style = androidx.compose.ui.text.TextStyle(
+                    style = TextStyle(
                         fontSize = fontSize,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -378,6 +383,16 @@ fun RenderMarkdownElement(
             
             is NormalText -> {
                 Text(text = buildString(element.text, weight), fontSize = fontSize)
+            }
+
+            is StrikeThroughCustom -> {
+                Text(
+                    text = buildString(element.text, weight),
+                    fontSize = fontSize,
+                    fontWeight = weight,
+                    textDecoration = TextDecoration.LineThrough,
+                    modifier = Modifier.padding(vertical = 10.dp)
+                )
             }
         }
         // Add new line to selectionContainer but don't render it

@@ -9,6 +9,11 @@ data class Heading(val level: Int, val text: String) : MarkdownElement {
         builder.append("#".repeat(level)).append(" $text\n\n")
     }
 }
+data class StrikeThroughCustom(val text: String) : MarkdownElement {
+    override fun render(builder: StringBuilder) {
+        builder.append("~~").append(" $text~~\n\n")
+    }
+}
 
 data class CheckboxItem(val text: String, var checked: Boolean = false, var index: Int) : MarkdownElement {
     override fun render(builder: StringBuilder) {
