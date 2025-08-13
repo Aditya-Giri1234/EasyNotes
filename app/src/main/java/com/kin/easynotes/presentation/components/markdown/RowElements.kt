@@ -1,6 +1,7 @@
 package com.kin.easynotes.presentation.components.markdown
 
 sealed interface MarkdownElement {
+    //All implemented this interface and this method not use case found.
     fun render(builder: StringBuilder)
 }
 

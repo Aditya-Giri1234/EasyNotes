@@ -34,6 +34,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // https://developer.android.com/guide/topics/resources/app-languages#gradle-config
         resourceConfigurations.plus(
@@ -80,7 +81,44 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
     buildToolsVersion = "34.0.0"
+
+// ✅ Explicitly tell Gradle where your source code and test code live.
+// This prevents mistakes like mixing test code with main code.
+// Also ensures correct Gradle tasks run with the right folders.
+//
+// Gradle has defaults (src/main/java, src/test/java, src/androidTest/java),
+// but if you ever override or customize source sets, you must tell Gradle explicitly.
+//
+// Using forward slashes ("/") works on Windows, macOS, and Linux — no need for double backslashes.
+    sourceSets {
+        // Main source set → Your production app code
+        // Compiled into APK / App Bundle
+        getByName("main") {
+            java.srcDirs("src/main/java")
+        }
+
+        // Unit test source set → Local JVM tests
+        // Runs on your computer without an Android device
+        // Uses dependencies from testImplementation
+        // Not packaged into the APK
+        getByName("test") {
+            java.srcDirs("src/test/java")
+        }
+
+        // Instrumentation test source set → Runs on Android device or emulator
+        // Uses dependencies from androidTestImplementation
+        // Not packaged into the APK (only for testing)
+        getByName("androidTest") {
+            java.srcDirs("src/androidTest/java")
+        }
+    }
+
 }
 
 dependencies {
@@ -103,4 +141,23 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.navigation.compose)
+
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    // Optional -- Mockito framework
+    testImplementation(libs.mockito.core)
+    // Optional -- mockito-kotlin
+    testImplementation(libs.mockito.kotlin)
+    // Optional -- Mockk framework
+    testImplementation(libs.mockk)
+
+    //Robolectric for simulate android classes in test source set
+    testImplementation(libs.robolectric)
+
+    //For Instrumented Test (Ui Test)
+    androidTestImplementation(libs.androidx.runner)
+    androidTestImplementation(libs.androidx.rules)
 }

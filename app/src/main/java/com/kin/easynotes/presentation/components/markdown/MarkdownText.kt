@@ -27,12 +27,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorProducer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -51,6 +53,7 @@ import com.kin.easynotes.presentation.screens.settings.model.SettingsViewModel
 import com.kin.easynotes.presentation.screens.settings.settings.shapeManager
 import com.kin.easynotes.presentation.theme.FontUtils
 import com.kin.easynotes.presentation.theme.linkColor
+import androidx.core.net.toUri
 
 
 @Composable
@@ -76,15 +79,18 @@ fun MarkdownCodeBlock(
 
 @Composable
 fun MarkdownQuote(content: String, fontSize: TextUnit) {
-    Row(horizontalArrangement = Arrangement.Center) {
+    val updatedHeightForBox = remember(fontSize){
+            (fontSize.value * 1.5).dp
+    }
+    Row(horizontalArrangement = Arrangement.Center , verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier
-                .height(22.dp)
-                .width(6.dp)
+                .height(updatedHeightForBox)
+                .width(4.dp)
                 .background(
                     MaterialTheme.colorScheme.surfaceContainerLow,
                     RoundedCornerShape(16.dp)
-                )
+                ) ,
         )
         Spacer(modifier = Modifier.width(6.dp))
         Text(
@@ -191,7 +197,8 @@ fun MarkdownContent(
 ) {
     if (isPreview) {
         Column(modifier = modifier) {
-             content.forEachIndexed { index, _ ->
+            // Here only first four lines are rendered in home screen. Like show some text in item. When user click then it show whole.
+             content.take(4).forEachIndexed { index, _ ->
                     RenderMarkdownElement(
                         radius = radius,
                         index = index,
@@ -323,6 +330,14 @@ fun RenderMarkdownElement(
 
             is Link -> {
                 val context = LocalContext.current
+                //Here is full working in simple
+                // suppose user type https://www.google.com hi https://www.google.com
+                // then we parse we got two url with there starting and ending index.
+                // but we have also full text which contain al text
+                // Now we maintain a pointer lastIndex
+                // when we loop starting which just take from list of url and it have index of start and end of that url.
+                // we just need compare if url starting index is greater then last index that means some common text should render as simple which 'hi' in above example.
+                // Now loop continues.
                 val annotatedString = buildAnnotatedString {
                     val fullText = element.fullText
                     var lastIndex = 0
@@ -338,10 +353,16 @@ fun RenderMarkdownElement(
                         }
                         
                         // Add the URL with a different style and tag for clickability
+                        //This "URL" is key , when user click to text we get this url part by this.
+                        // https://medium.com/@hhhhghhghu/interactive-text-using-jetpack-compose-c7dee20fa0ac go for more about push/pop operation
                         pushStringAnnotation("URL", url)
                         withStyle(SpanStyle(color = linkColor, fontWeight = weight)) {
                             append(url)
                         }
+                        //Don't remove this because when we apply pushStringAnnotation() as url link.
+                        //It work like stopper.
+                        // Like after declaring pushStringAnnotation whatever we append it look link. means it clickable.
+                        // if we don't used pop all text including normal also clickable.
                         pop()
                         
                         lastIndex = range.last + 1
@@ -357,10 +378,13 @@ fun RenderMarkdownElement(
                 ClickableText(
                     text = annotatedString,
                     onClick = { offset: Int ->
+                        // When user click text , it give us index. And we find this index belong to our url text following way.
+                        // By fetching or getting url from annotationString using "URL". Now we give offset which is start ane end both same.
+                        // If any url which fall into this offset. It return and perform below operation.
                         annotatedString.getStringAnnotations("URL", offset, offset)
                             .firstOrNull()?.let { annotation ->
                                 val intent = Intent(Intent.ACTION_VIEW)
-                                intent.data = Uri.parse(annotation.item)
+                                intent.data = annotation.item.toUri()
                                 context.startActivity(intent)
                             }
                     },
@@ -380,11 +404,6 @@ fun RenderMarkdownElement(
                         .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f))
                 )
             }
-            
-            is NormalText -> {
-                Text(text = buildString(element.text, weight), fontSize = fontSize)
-            }
-
             is StrikeThroughCustom -> {
                 Text(
                     text = buildString(element.text, weight),
@@ -394,6 +413,11 @@ fun RenderMarkdownElement(
                     modifier = Modifier.padding(vertical = 10.dp)
                 )
             }
+            is NormalText -> {
+                Text(text = buildString(element.text, weight), fontSize = fontSize)
+            }
+
+
         }
         // Add new line to selectionContainer but don't render it
         if (content.lastIndex != index) {

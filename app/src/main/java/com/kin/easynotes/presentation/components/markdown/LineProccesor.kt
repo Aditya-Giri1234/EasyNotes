@@ -17,6 +17,7 @@ class CodeBlockProcessor : MarkdownLineProcessor {
 
         while (index < builder.lines.size) {
             val nextLine = builder.lines[index]
+            //Until we don't get last line ```
             if (nextLine == "```") {
                 builder.lineIndex = index
                 isEnded = true
@@ -37,6 +38,7 @@ class CheckboxProcessor : MarkdownLineProcessor {
     override fun processLine(line: String, builder: MarkdownBuilder) {
         val checked = line.contains(Regex("^\\[[Xx]]"))
         val text = line.replace(Regex("^\\[[ xX]] ?"), "").trim()
+        //Here we store index also , because user can check or uncheck in preview mode. So we need show live things. During rendering we just update our list of string which we called lines. For specific check string. See RenderMarkdownElement composable.
         builder.add(CheckboxItem(text, checked, builder.lineIndex))
     }
 }

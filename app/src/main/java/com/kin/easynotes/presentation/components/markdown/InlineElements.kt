@@ -19,6 +19,9 @@ data class BoldSegment(override val delimiter: String = "**") : TextStyleSegment
 data class ItalicSegment(override val delimiter: String = "*") : TextStyleSegment {
     override fun getSpanStyle() = SpanStyle(fontStyle = FontStyle.Italic)
 }
+data class ItalicBoldSegment(override val delimiter: String = "***") : TextStyleSegment {
+    override fun getSpanStyle() = SpanStyle(fontStyle = FontStyle.Italic , fontWeight = FontWeight.Bold)
+}
 
 data class HighlightSegment(override val delimiter: String = "==") : TextStyleSegment {
     override fun getSpanStyle() = SpanStyle(background = Color.Yellow.copy(alpha = 0.2f))

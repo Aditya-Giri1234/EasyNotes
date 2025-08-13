@@ -126,7 +126,7 @@ fun HomeView (
                     isBoth = true
                 ),
                 onNoteClicked = { onNoteClicked(it, viewModel.isVaultMode.value)  },
-                notes = viewModel.getAllNotes().sortedWith(sorter(settingsModel.settings.value.sortDescending)),
+                notes = viewModel.getAllNotes().sortedWith(sorter(settingsModel.settings.value.sortDescending)),  // interesting in this way we can dynamic change our sorting order because it listen sortDescending variable.
                 selectedNotes = viewModel.selectedNotes,
                 viewMode = settingsModel.settings.value.viewMode,
                 searchText = viewModel.searchQuery.value.ifBlank { null },
