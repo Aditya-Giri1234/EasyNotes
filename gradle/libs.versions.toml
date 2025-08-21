@@ -31,6 +31,7 @@ junitKtx = "1.2.1"
 rules = "1.6.1"
 uiTestJunit4Android = "1.8.3"
 runnerVersion = "1.6.2"
+jetbrainsKotlinJvm = "2.0.0"
 
 [libraries]
 # Room
@@ -85,3 +86,4 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }

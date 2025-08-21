@@ -1,0 +1,2 @@
+#Needs to add our registry fully qualified name.So our custom lint can work.
+com.aditya.lint_rules.MyIssueRegistry

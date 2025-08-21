@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.kin.easynotes"
-    compileSdk = 34
+    compileSdk = 35
     flavorDimensions += "default"
 
     productFlavors {
@@ -28,7 +28,7 @@ android {
     defaultConfig {
         applicationId = "com.kin.easynotes"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 11
         versionName = "1.4"
         vectorDrawables {
@@ -160,4 +160,8 @@ dependencies {
     //For Instrumented Test (Ui Test)
     androidTestImplementation(libs.androidx.runner)
     androidTestImplementation(libs.androidx.rules)
+
+    //Custom lint
+    lintChecks(project(":lint-rules"))
+    debugImplementation(project(":lint-rules"))
 }

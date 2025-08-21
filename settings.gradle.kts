@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Easy Notes"
 include(":app")
- 
+include(":lint-rules")

@@ -1,5 +1,6 @@
 package com.kin.easynotes.presentation.components.markdown
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -8,6 +9,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
 import java.text.BreakIterator
 import androidx.compose.ui.text.withStyle
+import com.aditya.lint_rules.annotation.Buggy
+import com.aditya.lint_rules.annotation.NeedsImprovement
+import com.aditya.lint_rules.annotation.WrongApproach
 
 /**
  * This is class used iterator pattern. Like checking by hasNextLine() , nextLine() etc.
@@ -45,6 +49,7 @@ class MarkdownBuilder(internal val lines: List<String>, private var lineProcesso
  * Splits the input string by the specified delimiter and returns a list of index pairs.
  * Each pair represents the start and end indices of segments between delimiters.
  */
+@WrongApproach
 fun splitByDelimiter(input: String, delimiter: String): List<Pair<Int, Int>> {
     //Segment is nothing but a simple subString
     //Here we do nothing but split input string with delimiter and
@@ -53,6 +58,10 @@ fun splitByDelimiter(input: String, delimiter: String): List<Pair<Int, Int>> {
     // so here is string which is need is - { "hi " , "ok " , "no" }
     // when we make complete list which is  : - {"***" , "hi " , "****" ,"ok " ,"***","no"}
     // You can see every even position have delimiter.
+    //"This is **bold** text."
+    //"**This is **bold** text."
+    //"**This** is **bold** text."
+    //"This is bold text."
     val segments = mutableListOf<Pair<Int, Int>>()
     var startIndex = 0
     var delimiterIndex = input.indexOf(delimiter, startIndex)
@@ -61,7 +70,7 @@ fun splitByDelimiter(input: String, delimiter: String): List<Pair<Int, Int>> {
         if (startIndex != delimiterIndex) {
             segments.add(Pair(startIndex, delimiterIndex))
             //By Adding this we make final list hold even position delimiter and odd position our substring
-            segments.add(Pair(delimiterIndex, delimiterIndex))
+//            segments.add(Pair(delimiterIndex, delimiterIndex))
         } else {
             segments.add(Pair(startIndex, startIndex))
         }
@@ -77,6 +86,40 @@ fun splitByDelimiter(input: String, delimiter: String): List<Pair<Int, Int>> {
 
     // Only keep segments that are odd-indexed (i.e., inside delimiters)
     return segments.filterIndexed { index, _ -> index % 2 == 1 }
+}
+
+fun splitByDelimiterNew(input:String , delimiter: String) : List<Pair<Int,Int>>{
+    val segments = mutableListOf<Pair<Int, Int>>()
+    var startIndex = 0
+    var delimiterIndex = input.indexOf(delimiter, startIndex)
+    while(delimiterIndex != -1){
+        val segmentIndex = delimiterIndex + delimiter.length
+        if((segmentIndex + delimiter.length) < input.length && input.substring(segmentIndex , segmentIndex + delimiter.length)==delimiter){
+            startIndex = input.indexOf(" " , segmentIndex + delimiterIndex)
+            if(startIndex != -1){
+                delimiterIndex = input.indexOf(delimiter , startIndex)
+                continue
+            }else{
+                break
+            }
+        }
+        val nextDelimiterIndex = input.indexOf(delimiter, segmentIndex)
+        if(nextDelimiterIndex!=-1){
+            if(input[nextDelimiterIndex-1] == ' '){
+                startIndex = nextDelimiterIndex
+                delimiterIndex = nextDelimiterIndex
+                continue
+            }else {
+                segments.add(Pair(segmentIndex,nextDelimiterIndex))
+                startIndex = nextDelimiterIndex + delimiter.length
+                delimiterIndex = input.indexOf(delimiter, startIndex)
+                continue
+            }
+        }else{
+            break
+        }
+    }
+    return segments
 }
 
 /**
@@ -99,7 +142,8 @@ fun buildString(input: String, defaultFontWeight: FontWeight = FontWeight.Normal
 
     //Here we make a map like below :
     // TextStyleSegment -> List<Int,Int>(which contain substring strat and end index  which split by delimiter)
-    val allSegments = textStyleSegments.associateWith { splitByDelimiter(input, it.delimiter) }
+    val allSegments = textStyleSegments.associateWith { splitByDelimiterNew(input, it.delimiter) }
+    println("allSegments : $allSegments")
 
     fun getSpanStyle(index: Int): SpanStyle {
         val styles = textStyleSegments.filter { segment -> isInSegments(index, allSegments[segment]!!) }
