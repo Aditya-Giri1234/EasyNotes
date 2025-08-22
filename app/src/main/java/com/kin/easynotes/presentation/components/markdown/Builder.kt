@@ -88,21 +88,40 @@ fun splitByDelimiter(input: String, delimiter: String): List<Pair<Int, Int>> {
     return segments.filterIndexed { index, _ -> index % 2 == 1 }
 }
 
+@NeedsImprovement
 fun splitByDelimiterNew(input:String , delimiter: String) : List<Pair<Int,Int>>{
     val segments = mutableListOf<Pair<Int, Int>>()
     var startIndex = 0
     var delimiterIndex = input.indexOf(delimiter, startIndex)
     while(delimiterIndex != -1){
-        val segmentIndex = delimiterIndex + delimiter.length
-        if((segmentIndex + delimiter.length) < input.length && input.substring(segmentIndex , segmentIndex + delimiter.length)==delimiter){
-            startIndex = input.indexOf(" " , segmentIndex + delimiterIndex)
-            if(startIndex != -1){
-                delimiterIndex = input.indexOf(delimiter , startIndex)
-                continue
-            }else{
-                break
+        var segmentIndex = delimiterIndex + delimiter.length
+        when{
+            (segmentIndex + delimiter.length) < input.length -> {
+                if(input.substring(segmentIndex , segmentIndex + delimiter.length)==delimiter){
+                    startIndex = input.indexOf(" " , segmentIndex + delimiter.length)
+                    if(startIndex != -1){
+                        delimiterIndex = input.indexOf(delimiter , startIndex)
+                        continue
+                    }else{
+                        break
+                    }
+                }
+            }
+            else ->{
+                //**This is ***bold*** *hi* text.**
+                // This will handle if italic have * delimiter and it point to second last * and handle it which is not handle above part.
+                while(segmentIndex < input.length){
+                    if(input[segmentIndex] !in delimiter.toCharArray()){
+                        break
+                    }
+                    segmentIndex++
+                }
+                if(segmentIndex == input.length){
+                    break
+                }
             }
         }
+
         val nextDelimiterIndex = input.indexOf(delimiter, segmentIndex)
         if(nextDelimiterIndex!=-1){
             if(input[nextDelimiterIndex-1] == ' '){
@@ -145,6 +164,7 @@ fun buildString(input: String, defaultFontWeight: FontWeight = FontWeight.Normal
     val allSegments = textStyleSegments.associateWith { splitByDelimiterNew(input, it.delimiter) }
     println("allSegments : $allSegments")
 
+    @WrongApproach
     fun getSpanStyle(index: Int): SpanStyle {
         val styles = textStyleSegments.filter { segment -> isInSegments(index, allSegments[segment]!!) }
         return styles.fold(SpanStyle(fontWeight = defaultFontWeight)) { acc, segment -> acc.merge(segment.getSpanStyle()) }
@@ -153,7 +173,6 @@ fun buildString(input: String, defaultFontWeight: FontWeight = FontWeight.Normal
     val annotatedString = buildAnnotatedString {
         val iterator = BreakIterator.getWordInstance()
         iterator.setText(input)
-
         var start = iterator.first()
         var end = iterator.next()
 

@@ -1,5 +1,6 @@
 package com.kin.easynotes.pure_unit_test
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -81,6 +82,35 @@ class BuildStringTesting {
             println("actual : ${actual.spanStyles}")
         }
     }
+
+    @Test
+    fun `checking highlight string working`(){
+        // Arrange
+        val input = "**This** is ***bold*** ==hi== text.**"
+        println("This is bold hi text.")
+        val expected = buildAnnotatedString {
+            bold("This")
+            normal(" ")
+            normal("is")
+            normal(" ")
+            italic_bold("bold")
+            normal(" ")
+            highlight("hi")
+            normal(" ")
+            normal("text")
+            normal(".")
+        }
+
+        //Action
+        val actual = buildString(input)
+        println(actual)
+
+        //Assert
+        assert(expected == actual){
+            println("expected : ${expected.spanStyles}")
+            println("actual : ${actual.spanStyles}")
+        }
+    }
 }
 
 
@@ -107,6 +137,12 @@ fun AnnotatedString.Builder.italic(text: String) {
 }
 fun AnnotatedString.Builder.italic_bold(text: String) {
     withStyle(SpanStyle(fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold)) {
+        append(text)
+    }
+}
+
+fun AnnotatedString.Builder.highlight(text: String) {
+    withStyle(SpanStyle(background = Color.Yellow.copy(alpha = 0.2f))) {
         append(text)
     }
 }
