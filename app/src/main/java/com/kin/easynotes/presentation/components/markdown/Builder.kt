@@ -183,7 +183,7 @@ fun buildString(input: String, defaultFontWeight: FontWeight = FontWeight.Normal
             val isDelimiter = textStyleSegments.any { segment -> 
                 // Only consider it a delimiter if it's the exact delimiter string
                 // This ensures single characters like +, -, = are not filtered out
-                segment.delimiter == substring
+                segment.delimiter == substring || substring in segment.delimiter
             }
             
             if (!isDelimiter) {
