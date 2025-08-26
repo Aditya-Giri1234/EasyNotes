@@ -50,7 +50,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun HomeView (
+fun HomeView(
     viewModel: HomeViewModel = hiltViewModel(),
     settingsModel: SettingsViewModel,
     onSettingsClicked: () -> Unit,
@@ -125,13 +125,20 @@ fun HomeView (
                     radius = settingsModel.settings.value.cornerRadius / 2,
                     isBoth = true
                 ),
-                onNoteClicked = { onNoteClicked(it, viewModel.isVaultMode.value)  },
-                notes = viewModel.getAllNotes().sortedWith(sorter(settingsModel.settings.value.sortDescending)),  // interesting in this way we can dynamic change our sorting order because it listen sortDescending variable.
+                onNoteClicked = { onNoteClicked(it, viewModel.isVaultMode.value) },
+                notes = viewModel.getAllNotes()
+                    .sortedWith(sorter(settingsModel.settings.value.sortDescending)),  // interesting in this way we can dynamic change our sorting order because it listen sortDescending variable.
                 selectedNotes = viewModel.selectedNotes,
                 viewMode = settingsModel.settings.value.viewMode,
                 searchText = viewModel.searchQuery.value.ifBlank { null },
                 isDeleteMode = viewModel.isDeleteMode.value,
-                onNoteUpdate = { note -> CoroutineScope(Dispatchers.IO).launch {viewModel.noteUseCase.addNote(note) } },
+                onNoteUpdate = { note ->
+                    CoroutineScope(Dispatchers.IO).launch {
+                        viewModel.noteUseCase.addNote(
+                            note
+                        )
+                    }
+                },
                 onDeleteNote = {
                     viewModel.toggleIsDeleteMode(false)
                     viewModel.noteUseCase.deleteNoteById(it)
@@ -168,20 +175,25 @@ private fun SelectedNotesTopAppBar(
         mutableStateOf(false)
     }
     AnimatedVisibility(visible = deletelaert) {
-        AlertDialog(onDismissRequest = { deletelaert = false }, title = {
+        AlertDialog(
+            onDismissRequest = { deletelaert = false }, title = {
             Text(
                 text = stringResource(id = R.string.alert_text)
             )
         }, confirmButton = {
-            TextButton(onClick = { deletelaert=false
+            TextButton(onClick = {
+                deletelaert = false
                 onDeleteClick()
             }) {
-                Text(text = stringResource(id = R.string.yes), color = MaterialTheme.colorScheme.error )
+                Text(
+                    text = stringResource(id = R.string.yes),
+                    color = MaterialTheme.colorScheme.error
+                )
             }
         },
             dismissButton = {
                 TextButton(onClick = { deletelaert = false }) {
-                    Text(text =stringResource(id = R.string.cancel))
+                    Text(text = stringResource(id = R.string.cancel))
                 }
             })
 
@@ -198,7 +210,7 @@ private fun SelectedNotesTopAppBar(
         actions = {
             Row {
                 PinButton(isPinned = selectedNotes.all { it.pinned }, onClick = onPinClick)
-                DeleteButton(onClick =  {deletelaert = true})
+                DeleteButton(onClick = { deletelaert = true })
                 SelectAllButton(
                     enabled = selectedNotes.size != allNotes.size,
                     onClick = onSelectAllClick
@@ -222,7 +234,10 @@ private fun NotesSearchBar(
     SearchBar(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = if (settingsModel.settings.value.makeSearchBarLonger) 16.dp else 36.dp, vertical =  18.dp),
+            .padding(
+                horizontal = if (settingsModel.settings.value.makeSearchBarLonger) 16.dp else 36.dp,
+                vertical = 18.dp
+            ),
         query = query,
         placeholder = { Text(stringResource(R.string.search)) },
         leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = "Search") },

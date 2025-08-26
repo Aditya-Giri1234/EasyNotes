@@ -7,6 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -30,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavHostController
     private var settingsViewModel: SettingsViewModel? = null
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
@@ -51,6 +57,9 @@ class MainActivity : AppCompatActivity() {
 
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    modifier = Modifier.semantics {
+                        testTagsAsResourceId = true
+                    }
                 ) {
                     navController = rememberNavController()
                     AppNavHost(settingsViewModel!!, navController, noteId, settingsViewModel!!.defaultRoute!!)

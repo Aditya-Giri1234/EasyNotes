@@ -10,7 +10,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.kin.easynotes.core.constant.TestTagId
 
 
 @Composable
@@ -19,7 +21,7 @@ fun NotesButton(
     onClick: () -> Unit
 ) {
     ExtendedFloatingActionButton(
-        modifier = Modifier.imePadding(),
+        modifier = Modifier.imePadding().testTag(TestTagId.FLOATING_ACTION_BUTTON),
         shape = RoundedCornerShape(24.dp),
         onClick = { onClick() },
         icon = { Icon(Icons.Rounded.Edit, text) },

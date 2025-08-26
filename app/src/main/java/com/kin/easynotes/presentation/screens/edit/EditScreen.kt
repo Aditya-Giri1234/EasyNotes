@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -57,6 +58,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.kin.easynotes.R
+import com.kin.easynotes.core.constant.TestTagId
 import com.kin.easynotes.presentation.components.MoreButton
 import com.kin.easynotes.presentation.components.NavigationIcon
 import com.kin.easynotes.presentation.components.NotesScaffold
@@ -92,13 +94,22 @@ fun EditNoteView(
     viewModel.setupNoteData(id)
     ObserveLifecycleEvents(viewModel)
 
-    val pagerState = rememberPagerState(initialPage = if (id == 0 || isWidget || settingsViewModel.settings.value.editMode) 0 else 1, pageCount = { 2 })
+    val pagerState = rememberPagerState(
+        initialPage = if (id == 0 || isWidget || settingsViewModel.settings.value.editMode) 0 else 1,
+        pageCount = { 2 })
 
 
     val coroutineScope = rememberCoroutineScope()
 
     NotesScaffold(
-        topBar = { if (!settingsViewModel.settings.value.minimalisticMode) TopBar(pagerState, coroutineScope,onClickBack, viewModel) },
+        topBar = {
+            if (!settingsViewModel.settings.value.minimalisticMode) TopBar(
+                pagerState,
+                coroutineScope,
+                onClickBack,
+                viewModel
+            )
+        },
         content = { PagerContent(pagerState, viewModel, settingsViewModel, onClickBack) }
     )
 }
@@ -118,6 +129,7 @@ fun TopBarActions(pagerState: PagerState, onClickBack: () -> Unit, viewModel: Ed
                 SaveButton { onClickBack() }
             }
         }
+
         1 -> {
             Row {
                 MoreButton {
@@ -130,7 +142,12 @@ fun TopBarActions(pagerState: PagerState, onClickBack: () -> Unit, viewModel: Ed
                     if (viewModel.noteId.value != 0) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.delete)) },
-                            leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = "Delete")},
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Rounded.Delete,
+                                    contentDescription = "Delete"
+                                )
+                            },
                             onClick = {
                                 viewModel.toggleEditMenuVisibility(false)
                                 viewModel.deleteNote(viewModel.noteId.value)
@@ -140,19 +157,34 @@ fun TopBarActions(pagerState: PagerState, onClickBack: () -> Unit, viewModel: Ed
                     }
                     DropdownMenuItem(
                         text = { Text(stringResource(id = R.string.pinned)) },
-                        leadingIcon = { Icon(if (viewModel.isPinned.value) Icons.Rounded.PushPin else Icons.Outlined.PushPin, contentDescription = "Pin")},
+                        leadingIcon = {
+                            Icon(
+                                if (viewModel.isPinned.value) Icons.Rounded.PushPin else Icons.Outlined.PushPin,
+                                contentDescription = "Pin"
+                            )
+                        },
                         onClick = { viewModel.toggleNotePin(!viewModel.isPinned.value) }
                     )
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.copy)) },
-                        leadingIcon = { Icon(Icons.Rounded.ContentCopy, contentDescription = "Copy")},
+                        leadingIcon = {
+                            Icon(
+                                Icons.Rounded.ContentCopy,
+                                contentDescription = "Copy"
+                            )
+                        },
                         onClick = {
                             copyToClipboard(context, viewModel.noteDescription.value.text)
                         }
                     )
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.information)) },
-                        leadingIcon = { Icon(Icons.Rounded.Info, contentDescription = "Information")},
+                        leadingIcon = {
+                            Icon(
+                                Icons.Rounded.Info,
+                                contentDescription = "Information"
+                            )
+                        },
                         onClick = {
                             viewModel.toggleEditMenuVisibility(false)
                             viewModel.toggleNoteInfoVisibility(true)
@@ -166,10 +198,17 @@ fun TopBarActions(pagerState: PagerState, onClickBack: () -> Unit, viewModel: Ed
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PagerContent(pagerState: PagerState, viewModel: EditViewModel,settingsViewModel: SettingsViewModel, onClickBack: () -> Unit) {
+fun PagerContent(
+    pagerState: PagerState,
+    viewModel: EditViewModel,
+    settingsViewModel: SettingsViewModel,
+    onClickBack: () -> Unit
+) {
     HorizontalPager(
         state = pagerState,
-        modifier = Modifier.imePadding(),
+        modifier = Modifier
+            .imePadding()
+            .testTag(TestTagId.EDIT_NOTE_SCREEN),
         userScrollEnabled = !settingsViewModel.settings.value.disableSwipeInEditMode
     ) { page ->
         when (page) {
@@ -181,7 +220,12 @@ fun PagerContent(pagerState: PagerState, viewModel: EditViewModel,settingsViewMo
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(pagerState: PagerState,coroutineScope: CoroutineScope, onClickBack: () -> Unit, viewModel: EditViewModel) {
+fun TopBar(
+    pagerState: PagerState,
+    coroutineScope: CoroutineScope,
+    onClickBack: () -> Unit,
+    viewModel: EditViewModel
+) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
         title = { ModeButton(pagerState, coroutineScope) },
@@ -192,8 +236,8 @@ fun TopBar(pagerState: PagerState,coroutineScope: CoroutineScope, onClickBack: (
                     UndoButton { viewModel.undo() }
                 }
             }
-     },
-        actions = { TopBarActions(pagerState,  onClickBack, viewModel) }
+        },
+        actions = { TopBarActions(pagerState, onClickBack, viewModel) }
     )
 }
 
@@ -228,7 +272,10 @@ fun BottomModal(viewModel: EditViewModel, settingsViewModel: SettingsViewModel) 
                 title = stringResource(R.string.created_time),
                 icon = Icons.Rounded.Numbers,
                 actionType = ActionType.TEXT,
-                radius = shapeManager(isFirst = true, radius = settingsViewModel.settings.value.cornerRadius),
+                radius = shapeManager(
+                    isFirst = true,
+                    radius = settingsViewModel.settings.value.cornerRadius
+                ),
                 customText = sdf.format(viewModel.noteCreatedTime.value).toString()
             )
             SettingsBox(
@@ -237,14 +284,19 @@ fun BottomModal(viewModel: EditViewModel, settingsViewModel: SettingsViewModel) 
                 icon = Icons.Rounded.Numbers,
                 radius = shapeManager(radius = settingsViewModel.settings.value.cornerRadius),
                 actionType = ActionType.TEXT,
-                customText = if (viewModel.noteDescription.value.text != "") viewModel.noteDescription.value.text.split("\\s+".toRegex()).size.toString() else "0"
+                customText = if (viewModel.noteDescription.value.text != "") viewModel.noteDescription.value.text.split(
+                    "\\s+".toRegex()
+                ).size.toString() else "0"
             )
             SettingsBox(
                 size = 8.dp,
                 title = stringResource(R.string.characters),
                 icon = Icons.Rounded.Numbers,
                 actionType = ActionType.TEXT,
-                radius = shapeManager(radius = settingsViewModel.settings.value.cornerRadius, isLast = true),
+                radius = shapeManager(
+                    radius = settingsViewModel.settings.value.cornerRadius,
+                    isLast = true
+                ),
                 customText = viewModel.noteDescription.value.text.length.toString()
             )
         }
@@ -254,7 +306,7 @@ fun BottomModal(viewModel: EditViewModel, settingsViewModel: SettingsViewModel) 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MinimalisticMode(
-    alignment : Alignment.Vertical = Alignment.CenterVertically,
+    alignment: Alignment.Vertical = Alignment.CenterVertically,
     viewModel: EditViewModel,
     modifier: Modifier = Modifier,
     isEnabled: Boolean, pagerState: PagerState,
@@ -273,16 +325,27 @@ fun MinimalisticMode(
             if (isEnabled) NavigationIcon(onClickBack)
             if (isEnabled && viewModel.isDescriptionInFocus.value) UndoButton { viewModel.undo() }
             content()
-            if (isEnabled) TopBarActions(pagerState,  onClickBack, viewModel)
-            if (isEnabled) ModeButton(pagerState, coroutineScope, isMinimalistic = true, isExtremeAmoled = isExtremeAmoled) } else {
+            if (isEnabled) TopBarActions(pagerState, onClickBack, viewModel)
+            if (isEnabled) ModeButton(
+                pagerState,
+                coroutineScope,
+                isMinimalistic = true,
+                isExtremeAmoled = isExtremeAmoled
+            )
+        } else {
             Column {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (isEnabled) NavigationIcon(onClickBack)
                     Spacer(modifier = Modifier.weight(1f))
-                    if (isEnabled) ModeButton(pagerState, coroutineScope, isMinimalistic = true, isExtremeAmoled = isExtremeAmoled)
-                    if (isEnabled) TopBarActions(pagerState,  onClickBack, viewModel)
+                    if (isEnabled) ModeButton(
+                        pagerState,
+                        coroutineScope,
+                        isMinimalistic = true,
+                        isExtremeAmoled = isExtremeAmoled
+                    )
+                    if (isEnabled) TopBarActions(pagerState, onClickBack, viewModel)
                 }
                 content()
             }
@@ -291,19 +354,31 @@ fun MinimalisticMode(
 }
 
 
-
 @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Composable
-fun EditScreen(viewModel: EditViewModel,settingsViewModel: SettingsViewModel, pagerState: PagerState,onClickBack: () -> Unit) {
+fun EditScreen(
+    viewModel: EditViewModel,
+    settingsViewModel: SettingsViewModel,
+    pagerState: PagerState,
+    onClickBack: () -> Unit
+) {
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp, 16.dp, 16.dp, if (viewModel.isDescriptionInFocus.value && settingsViewModel.settings.value.isMarkdownEnabled) 2.dp else 16.dp)
+            .padding(
+                16.dp,
+                16.dp,
+                16.dp,
+                if (viewModel.isDescriptionInFocus.value && settingsViewModel.settings.value.isMarkdownEnabled) 2.dp else 16.dp
+            )
     ) {
         MarkdownBox(
             isExtremeAmoled = settingsViewModel.settings.value.extremeAmoledMode,
-            shape = shapeManager(radius = settingsViewModel.settings.value.cornerRadius, isFirst = true),
+            shape = shapeManager(
+                radius = settingsViewModel.settings.value.cornerRadius,
+                isFirst = true
+            ),
             content = {
                 MinimalisticMode(
                     viewModel = viewModel,
@@ -326,7 +401,10 @@ fun EditScreen(viewModel: EditViewModel,settingsViewModel: SettingsViewModel, pa
         )
         MarkdownBox(
             isExtremeAmoled = settingsViewModel.settings.value.extremeAmoledMode,
-            shape = shapeManager(radius = settingsViewModel.settings.value.cornerRadius, isLast = true),
+            shape = shapeManager(
+                radius = settingsViewModel.settings.value.cornerRadius,
+                isLast = true
+            ),
             modifier = Modifier
                 .weight(1f)
                 .onFocusChanged { viewModel.toggleIsDescriptionInFocus(it.isFocused) },
@@ -334,19 +412,26 @@ fun EditScreen(viewModel: EditViewModel,settingsViewModel: SettingsViewModel, pa
                 CustomTextField(
                     value = viewModel.noteDescription.value,
                     onValueChange = { viewModel.updateNoteDescription(it) },
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().testTag(TestTagId.EDIT_TEXT_SPACE),
                     placeholder = stringResource(R.string.description),
                     useMonoSpaceFont = settingsViewModel.settings.value.useMonoSpaceFont
                 )
             }
         )
-        if (viewModel.isDescriptionInFocus.value && settingsViewModel.settings.value.isMarkdownEnabled) TextFormattingToolbar(viewModel)
+        if (viewModel.isDescriptionInFocus.value && settingsViewModel.settings.value.isMarkdownEnabled) TextFormattingToolbar(
+            viewModel
+        )
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PreviewScreen(viewModel: EditViewModel, settingsViewModel: SettingsViewModel, pagerState: PagerState, onClickBack: () -> Unit) {
+fun PreviewScreen(
+    viewModel: EditViewModel,
+    settingsViewModel: SettingsViewModel,
+    pagerState: PagerState,
+    onClickBack: () -> Unit
+) {
     if (viewModel.isNoteInfoVisible.value) BottomModal(viewModel, settingsViewModel)
 
     val focusManager = LocalFocusManager.current
@@ -359,7 +444,10 @@ fun PreviewScreen(viewModel: EditViewModel, settingsViewModel: SettingsViewModel
         if (showOnlyDescription) {
             MarkdownBox(
                 isExtremeAmoled = settingsViewModel.settings.value.extremeAmoledMode,
-                shape = shapeManager(radius = settingsViewModel.settings.value.cornerRadius, isFirst = true),
+                shape = shapeManager(
+                    radius = settingsViewModel.settings.value.cornerRadius,
+                    isFirst = true
+                ),
                 content = {
                     MinimalisticMode(
                         viewModel = viewModel,
@@ -387,7 +475,11 @@ fun PreviewScreen(viewModel: EditViewModel, settingsViewModel: SettingsViewModel
         }
         MarkdownBox(
             isExtremeAmoled = settingsViewModel.settings.value.extremeAmoledMode,
-            shape = shapeManager(radius = settingsViewModel.settings.value.cornerRadius, isLast = (showOnlyDescription), isBoth = (!showOnlyDescription)),
+            shape = shapeManager(
+                radius = settingsViewModel.settings.value.cornerRadius,
+                isLast = (showOnlyDescription),
+                isBoth = (!showOnlyDescription)
+            ),
             modifier = Modifier.fillMaxSize(),
             content = {
                 MinimalisticMode(
@@ -413,8 +505,9 @@ fun PreviewScreen(viewModel: EditViewModel, settingsViewModel: SettingsViewModel
                             )
                             .weight(1f),
                         onContentChange = { viewModel.updateNoteDescription(TextFieldValue(text = it)) },
-                        settingsViewModel = settingsViewModel)
-                    }
+                        settingsViewModel = settingsViewModel
+                    )
+                }
             }
         )
     }
@@ -460,6 +553,7 @@ fun ModeButton(
     Row {
         if (!isMinimalistic) {
             RenderButton(
+                modifier = Modifier.testTag(TestTagId.EDIT_TEXT_MODE),
                 pagerState,
                 coroutineScope,
                 0,
@@ -468,17 +562,27 @@ fun ModeButton(
                 isExtremeAmoled
             )
             RenderButton(
-                    pagerState,
-            coroutineScope,
-            1,
-            Icons.Rounded.RemoveRedEye,
-            false,
-            isExtremeAmoled
+                modifier = Modifier.testTag(TestTagId.PREVIEW_TEXT_MODE),
+                pagerState,
+                coroutineScope,
+                1,
+                Icons.Rounded.RemoveRedEye,
+                false,
+                isExtremeAmoled
             )
         } else {
             val currentPage = pagerState.currentPage
             val icon = if (currentPage == 1) Icons.Rounded.Edit else Icons.Rounded.RemoveRedEye
-            RenderButton(pagerState, coroutineScope, if (currentPage == 1) 0 else 1, icon, true, isExtremeAmoled)
+            val testTag = if (currentPage == 1) TestTagId.EDIT_TEXT_MODE else TestTagId.PREVIEW_TEXT_MODE
+            RenderButton(
+                modifier = Modifier.testTag(testTag),
+                pagerState,
+                coroutineScope,
+                if (currentPage == 1) 0 else 1,
+                icon,
+                true,
+                isExtremeAmoled
+            )
         }
     }
 }
@@ -486,6 +590,7 @@ fun ModeButton(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun RenderButton(
+    modifier: Modifier,
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     pageIndex: Int,
@@ -494,7 +599,11 @@ private fun RenderButton(
     isExtremeAmoled: Boolean
 ) {
     CustomIconButton(
-        shape = if (isMinimalistic) RoundedCornerShape(100) else if (pageIndex == 0) RoundedCornerShape(topStart = 32.dp, bottomStart = 32.dp) else RoundedCornerShape(bottomEnd = 32.dp, topEnd = 32.dp),
+        modifier,
+        shape = if (isMinimalistic) RoundedCornerShape(100) else if (pageIndex == 0) RoundedCornerShape(
+            topStart = 32.dp,
+            bottomStart = 32.dp
+        ) else RoundedCornerShape(bottomEnd = 32.dp, topEnd = 32.dp),
         onClick = {
             coroutineScope.launch {
                 pagerState.animateScrollToPage(pageIndex)

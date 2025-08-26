@@ -31,6 +31,8 @@ import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalAutofill
 import androidx.compose.ui.platform.LocalAutofillTree
+import androidx.compose.ui.platform.testTag
+import com.kin.easynotes.core.constant.TestTagId
 import com.kin.easynotes.presentation.components.AutoFillRequestHandler
 import com.kin.easynotes.presentation.components.connectNode
 import com.kin.easynotes.presentation.components.defaultFocusChangeAutoFill
@@ -91,7 +93,7 @@ fun CustomTextField(
                         .connectNode(handler = autoFillHandler)
                         .defaultFocusChangeAutoFill(handler = autoFillHandler)
                 } else Modifier
-            ),
+            ).testTag(TestTagId.EDIT_TEXT_SPACE_VIEW),
 
         singleLine = singleLine,
         colors = TextFieldDefaults.colors(

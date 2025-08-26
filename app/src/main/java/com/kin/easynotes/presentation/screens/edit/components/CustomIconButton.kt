@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CustomIconButton(
+    modifier: Modifier = Modifier,
     shape: RoundedCornerShape,
     elevation: Dp,
     icon: ImageVector,
@@ -23,7 +24,7 @@ fun CustomIconButton(
     ElevatedCard(
         shape = shape,
         elevation = CardDefaults.cardElevation(defaultElevation = elevation),
-        modifier = Modifier
+        modifier = modifier
             .clip(shape)
             .clickable { onClick() }
     ) {
