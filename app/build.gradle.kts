@@ -147,7 +147,8 @@ dependencies {
     androidTestImplementation(libs.androidx.junit.ktx)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.test.manifest)
     // Optional -- Mockito framework
     testImplementation(libs.mockito.core)
     // Optional -- mockito-kotlin
@@ -165,4 +166,25 @@ dependencies {
     //Custom lint
     lintChecks(project(":lint-rules"))
     debugImplementation(project(":lint-rules"))
+}
+
+
+tasks.register("greeting"){
+    doFirst{
+        println("Starting greeting task")
+    }
+    doLast{
+        println("Ending greeting task")
+    }
+}
+
+tasks.register("hello"){
+    doFirst{
+        println("Starting hello task")
+    }
+    doLast{
+        println("Ending hello task")
+    }
+
+    dependsOn("greeting")
 }
