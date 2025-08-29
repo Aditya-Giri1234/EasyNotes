@@ -166,6 +166,9 @@ dependencies {
     //Custom lint
     lintChecks(project(":lint-rules"))
     debugImplementation(project(":lint-rules"))
+
+    //hilt test
+    debugImplementation(libs.hilt.testing)
 }
 
 

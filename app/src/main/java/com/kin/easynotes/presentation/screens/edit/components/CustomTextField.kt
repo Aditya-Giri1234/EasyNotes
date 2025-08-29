@@ -93,7 +93,7 @@ fun CustomTextField(
                         .connectNode(handler = autoFillHandler)
                         .defaultFocusChangeAutoFill(handler = autoFillHandler)
                 } else Modifier
-            ).testTag(TestTagId.EDIT_TEXT_SPACE_VIEW),
+            ),
 
         singleLine = singleLine,
         colors = TextFieldDefaults.colors(

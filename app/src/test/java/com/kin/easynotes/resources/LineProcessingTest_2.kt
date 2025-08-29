@@ -44,16 +44,23 @@ import org.robolectric.annotation.LooperMode
 import org.robolectric.shadows.ShadowLog
 import javax.inject.Inject
 
+/**
+ *
+ * [See More about this basic testing on ](https://developer.android.com/training/dependency-injection/hilt-testing)
+ * */
 @RunWith(RobolectricTestRunner::class)
 @HiltAndroidTest
+//https://github.com/robolectric/robolectric/issues/5356 For this issue we need below annotation
 @LooperMode(LooperMode.Mode.PAUSED)
+//https://medium.com/@drflakelorenzgerman/tdd-part-iii-hilt-and-robolectric-android-dc941e3538f4 For Below
 @Config(
     application = HiltTestApplication::class,
     instrumentedPackages = [
         // required to access final members on androidx.loader.content.ModernAsyncTask
         "androidx.loader.content"
     ])
-class LineProcessingTest{
+
+class LineProcessingTest2{
 
     @get:Rule(order = 0)
     val hiltRule  = HiltAndroidRule(this)
@@ -92,14 +99,17 @@ class LineProcessingTest{
             noteUseCase,
             importExportUseCase
         )
-        // Here we don't intend to change main activity set content view.
-        // We make simple setting Viewmodel object for future purpose.
-        // And we can also access main activity variable by below way
-        //(composeTestRule.activity as MainActivity)
-        // Flow is simple
-        // 1. Manifest file read
-        // 2. Launcher activity launch
-        // 3. Content set and flow proceed
+        //https://stackoverflow.com/a/79210545/17464278
+        //why i used activity here , follow above issue
+        // Here we simply override MainActivity default set content function
+        composeTestRule.activity.setContent {
+            AppNavHost(
+                settingsModel = settingsViewModel,
+                rememberNavController(),
+                -1,
+                NavRoutes.Home.route
+            )
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -110,6 +120,8 @@ class LineProcessingTest{
 
     @Test
     fun `test code block flow in edit screen`(){
+        //https://robolectric.org/blog/2019/06/04/paused-looper/
+        // We need below idle because see above
         shadowOf(getMainLooper()).idle()
         composeTestRule.onNodeWithTag(TestTagId.FLOATING_ACTION_BUTTON).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTagId.FLOATING_ACTION_BUTTON).performClick()

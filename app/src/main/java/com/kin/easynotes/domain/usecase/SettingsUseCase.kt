@@ -6,6 +6,7 @@ import com.kin.easynotes.core.constant.ConnectionConst
 import com.kin.easynotes.data.repository.SettingsRepositoryImpl
 import com.kin.easynotes.domain.model.Settings
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.lang.reflect.Modifier
 import javax.inject.Inject
 
 class SettingsUseCase @Inject constructor(
@@ -18,6 +19,15 @@ class SettingsUseCase @Inject constructor(
             Settings::class.java.declaredFields.forEach { field ->
                 field.isAccessible = true
                 val settingName = field.name
+                val modifiers = field.modifiers
+
+                // We need this block on testing purpose, because in testing environment a stable variable add dynamic which is final and static which is not allowed to change. Which through exception. So we need to avoid all final and static variables.
+                val isStatic = Modifier.isStatic(modifiers)
+                val isFinal = Modifier.isFinal(modifiers)
+                if (isStatic ||  isFinal) {
+                    return@forEach
+                }
+
                 val defaultValue = field.get(this)
                 val settingValue = getSettingValue(field.type, settingName, defaultValue)
                 field.set(this, settingValue)
