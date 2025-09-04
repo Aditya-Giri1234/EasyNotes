@@ -503,7 +503,7 @@ fun PreviewScreen(
                                 16.dp,
                                 16.dp
                             )
-                            .weight(1f),
+                            .weight(1f).testTag(TestTagId.PREVIEW_TEXT_SPACE),
                         onContentChange = { viewModel.updateNoteDescription(TextFieldValue(text = it)) },
                         settingsViewModel = settingsViewModel
                     )

@@ -3,9 +3,14 @@ package com.kin.easynotes.resources
 import android.os.Looper
 import android.os.Looper.getMainLooper
 import androidx.activity.compose.setContent
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.colorspace.ColorSpace
+import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -33,6 +38,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
+import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -83,6 +90,8 @@ class LineProcessingTest2{
 
 
     private val testDispatcher = StandardTestDispatcher()
+    private lateinit var codeBlockColorName : String
+    private  var codeBlockColor : Color = Color.Black
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -109,6 +118,8 @@ class LineProcessingTest2{
                 -1,
                 NavRoutes.Home.route
             )
+            codeBlockColorName = MaterialTheme.colorScheme.surfaceContainerLow.colorSpace.name
+            codeBlockColor = MaterialTheme.colorScheme.surfaceContainerLow
         }
     }
 
@@ -128,8 +139,23 @@ class LineProcessingTest2{
         composeTestRule.onNodeWithTag(TestTagId.EDIT_NOTE_SCREEN).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_MODE).performClick()
         composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_SPACE).performClick()
-        composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_SPACE).performTextInput("asd@gmail.com")
-        composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_SPACE).assertTextEquals("asd@gmail.com")
+        composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_SPACE).performTextInput("""
+            ```
+            fun main(){
+            print("Hello World")
+            }
+            ```
+        """.trimIndent())
+        composeTestRule.onNodeWithTag(TestTagId.PREVIEW_TEXT_MODE).performClick()
+//        val captureColorName = composeTestRule.onNodeWithTag(TestTagId.PREVIEW_CODE_BLOCK_ELEMENT).captureToImage().colorSpace.name
+//
+//        assertEquals(codeBlockColorName , captureColorName)
+        val codeBlockColorArray : IntArray = IntArray(20)
+        composeTestRule.onNodeWithTag(TestTagId.PREVIEW_CODE_BLOCK_ELEMENT).captureToImage().readPixels(codeBlockColorArray , 500 , 400 , 5 , 4)
+        codeBlockColorArray.forEach {
+            Assert.assertNotEquals(codeBlockColor.convert(ColorSpaces.Srgb) , it)
+        }
+
     }
 
 }

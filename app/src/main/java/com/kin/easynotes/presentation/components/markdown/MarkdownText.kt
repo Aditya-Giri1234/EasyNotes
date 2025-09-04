@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorProducer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -54,15 +55,17 @@ import com.kin.easynotes.presentation.screens.settings.settings.shapeManager
 import com.kin.easynotes.presentation.theme.FontUtils
 import com.kin.easynotes.presentation.theme.linkColor
 import androidx.core.net.toUri
+import com.kin.easynotes.core.constant.TestTagId
 
 
 @Composable
 fun MarkdownCodeBlock(
+    modifier: Modifier = Modifier,
     color: Color,
     text: @Composable () -> Unit
 ) {
     Box(
-        modifier = Modifier.padding(top = 6.dp),
+        modifier = modifier.padding(top = 6.dp),
         content = {
             Surface(
                 color = color,
@@ -310,7 +313,7 @@ fun RenderMarkdownElement(
 
             is CodeBlock -> {
                 if (element.isEnded) {
-                    MarkdownCodeBlock(color = MaterialTheme.colorScheme.surfaceContainerLow) {
+                    MarkdownCodeBlock(modifier = Modifier.testTag(TestTagId.PREVIEW_CODE_BLOCK_ELEMENT), color = MaterialTheme.colorScheme.surfaceContainerLow) {
                         Text(
                             text = element.code.dropLast(1),
                             fontSize = fontSize,
