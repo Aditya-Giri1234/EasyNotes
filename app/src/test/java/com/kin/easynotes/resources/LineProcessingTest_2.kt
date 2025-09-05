@@ -151,6 +151,7 @@ class LineProcessingTest2{
 //
 //        assertEquals(codeBlockColorName , captureColorName)
         val codeBlockColorArray : IntArray = IntArray(20)
+        //For now just think or remember in this way pixel reading we got perfect output.
         composeTestRule.onNodeWithTag(TestTagId.PREVIEW_CODE_BLOCK_ELEMENT).captureToImage().readPixels(codeBlockColorArray , 500 , 400 , 5 , 4)
         codeBlockColorArray.forEach {
             Assert.assertNotEquals(codeBlockColor.convert(ColorSpaces.Srgb) , it)
