@@ -8,14 +8,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.colorspace.ColorSpace
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performCustomAccessibilityActionWithLabelMatching
 import androidx.compose.ui.test.performTextInput
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
@@ -156,6 +160,25 @@ class LineProcessingTest2{
         codeBlockColorArray.forEach {
             Assert.assertNotEquals(codeBlockColor.convert(ColorSpaces.Srgb) , it)
         }
+
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun `test insert image syntax`(){
+        shadowOf(getMainLooper()).idle()
+        composeTestRule.onNodeWithTag(TestTagId.FLOATING_ACTION_BUTTON).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTagId.FLOATING_ACTION_BUTTON).performClick()
+        composeTestRule.onNodeWithTag(TestTagId.EDIT_NOTE_SCREEN).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_MODE).performClick()
+        composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_SPACE).performClick()
+        composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_SPACE).performTextInput("!(https://plus.unsplash.com/premium_photo-1757260019141-458516170c6c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8)")
+        composeTestRule.onNodeWithTag(TestTagId.PREVIEW_TEXT_MODE).performClick()
+        val desiredNode = composeTestRule.onNodeWithContentDescription("(https://plus.unsplash.com/premium_photo-1757260019141-458516170c6c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8".hashCode().toString())
+        composeTestRule.waitUntil {
+            desiredNode.isDisplayed()
+        }
+
 
     }
 

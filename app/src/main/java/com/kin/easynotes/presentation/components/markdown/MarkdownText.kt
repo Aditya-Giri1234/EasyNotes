@@ -36,6 +36,9 @@ import androidx.compose.ui.graphics.ColorProducer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -55,6 +58,7 @@ import com.kin.easynotes.presentation.screens.settings.settings.shapeManager
 import com.kin.easynotes.presentation.theme.FontUtils
 import com.kin.easynotes.presentation.theme.linkColor
 import androidx.core.net.toUri
+import coil.compose.AsyncImagePainter
 import com.kin.easynotes.core.constant.TestTagId
 
 
@@ -304,10 +308,18 @@ fun RenderMarkdownElement(
                         .clip(shape = shapeManager(isBoth = true, radius = radius / 2))
                         .clickable { /* Just for animation */ }
                 }
+                var imageState : AsyncImagePainter.State = remember {
+                    AsyncImagePainter.State.Empty
+                }
                 AsyncImage(
                     model = element.photoUri,
-                    contentDescription = "Image",
-                    modifier = modifier
+                    contentDescription = element.photoUri.hashCode().toString(),
+                    modifier = modifier.semantics {
+                        testTag  = imageState.toString()
+                    } ,
+                    onState = {
+                        imageState = it
+                    }
                 )
             }
 
