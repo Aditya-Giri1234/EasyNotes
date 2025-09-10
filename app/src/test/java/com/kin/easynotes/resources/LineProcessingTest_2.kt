@@ -23,6 +23,7 @@ import androidx.compose.ui.test.performCustomAccessibilityActionWithLabelMatchin
 import androidx.compose.ui.test.performTextInput
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImagePainter
 import com.kin.easynotes.core.constant.TestTagId
 import com.kin.easynotes.data.repository.ImportExportRepository
 import com.kin.easynotes.domain.usecase.ImportExportUseCase
@@ -49,6 +50,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment.application
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.LooperMode
@@ -175,10 +177,10 @@ class LineProcessingTest2{
         composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_SPACE).performTextInput("!(https://plus.unsplash.com/premium_photo-1757260019141-458516170c6c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8)")
         composeTestRule.onNodeWithTag(TestTagId.PREVIEW_TEXT_MODE).performClick()
         val desiredNode = composeTestRule.onNodeWithContentDescription("(https://plus.unsplash.com/premium_photo-1757260019141-458516170c6c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8".hashCode().toString())
-        composeTestRule.waitUntil {
+        composeTestRule.waitUntil(5000) {
             desiredNode.isDisplayed()
         }
-
+        composeTestRule.onNodeWithTag("(https://plus.unsplash.com/premium_photo-1757260019141-458516170c6c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8".hashCode().toString() + "Success").assertIsDisplayed()
 
     }
 

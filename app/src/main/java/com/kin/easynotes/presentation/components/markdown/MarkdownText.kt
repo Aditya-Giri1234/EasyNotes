@@ -315,7 +315,10 @@ fun RenderMarkdownElement(
                     model = element.photoUri,
                     contentDescription = element.photoUri.hashCode().toString(),
                     modifier = modifier.semantics {
-                        testTag  = imageState.toString()
+                        testTag  = when(imageState){
+                            is AsyncImagePainter.State.Success -> element.photoUri.hashCode().toString() + "Success"
+                            else -> element.photoUri.hashCode().toString() + "Failed"
+                        }
                     } ,
                     onState = {
                         imageState = it
