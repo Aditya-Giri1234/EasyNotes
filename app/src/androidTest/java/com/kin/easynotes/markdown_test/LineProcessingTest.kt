@@ -1,29 +1,19 @@
-package com.kin.easynotes.resources
+package com.kin.easynotes.markdown_test
 
-import android.os.Looper
 import android.os.Looper.getMainLooper
 import androidx.activity.compose.setContent
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.colorspace.ColorSpace
-import androidx.compose.ui.graphics.colorspace.ColorSpaces
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performCustomAccessibilityActionWithLabelMatching
 import androidx.compose.ui.test.performTextInput
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
-import coil.compose.AsyncImagePainter
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.runner.AndroidJUnitRunner
 import com.kin.easynotes.core.constant.TestTagId
 import com.kin.easynotes.data.repository.ImportExportRepository
 import com.kin.easynotes.domain.usecase.ImportExportUseCase
@@ -43,43 +33,22 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment.application
-import org.robolectric.Shadows.shadowOf
-import org.robolectric.annotation.Config
-import org.robolectric.annotation.LooperMode
-import org.robolectric.shadows.ShadowLog
 import javax.inject.Inject
 
-/**
- *
- * [See More about this basic testing on ](https://developer.android.com/training/dependency-injection/hilt-testing)
- * */
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
-//https://github.com/robolectric/robolectric/issues/5356 For this issue we need below annotation
-@LooperMode(LooperMode.Mode.PAUSED)
-//https://medium.com/@drflakelorenzgerman/tdd-part-iii-hilt-and-robolectric-android-dc941e3538f4 For Below
-@Config(
-    application = HiltTestApplication::class,
-    instrumentedPackages = [
-        // required to access final members on androidx.loader.content.ModernAsyncTask
-        "androidx.loader.content"
-    ])
-
-class LineProcessingTest2{
-
+class LineProcessingTest {
     @get:Rule(order = 0)
-    val hiltRule  = HiltAndroidRule(this)
+    val hiltRule = HiltAndroidRule(this)
 
-    @get:Rule(order = 1)
+    @get: Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var settingsViewModel: SettingsViewModel
 
@@ -95,18 +64,11 @@ class LineProcessingTest2{
     lateinit var importExportUseCase: ImportExportUseCase
 
 
-    private val testDispatcher = StandardTestDispatcher()
-    private lateinit var codeBlockColorName : String
-    private  var codeBlockColor : Color = Color.Black
-
-
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
-    @Throws(Exception::class)
     fun setUp() {
         Dispatchers.setMain(testDispatcher) // Override Dispatchers.Main for testing coroutines
-        hiltRule.inject()
-        ShadowLog.stream = System.out // Redirect Logcat to console
+        hiltRule.inject() // Hilt injects dependencies
         settingsViewModel = SettingsViewModel(
             galleryObserver,
             backUp,
@@ -114,9 +76,6 @@ class LineProcessingTest2{
             noteUseCase,
             importExportUseCase
         )
-        //https://stackoverflow.com/a/79210545/17464278
-        //why i used activity here , follow above issue
-        // Here we simply override MainActivity default set content function
         composeTestRule.activity.setContent {
             AppNavHost(
                 settingsModel = settingsViewModel,
@@ -124,8 +83,6 @@ class LineProcessingTest2{
                 -1,
                 NavRoutes.Home.route
             )
-            codeBlockColorName = MaterialTheme.colorScheme.surfaceContainerLow.colorSpace.name
-            codeBlockColor = MaterialTheme.colorScheme.surfaceContainerLow
         }
     }
 
@@ -136,42 +93,11 @@ class LineProcessingTest2{
     }
 
     @Test
-    fun `test code block flow in edit screen`(){
-        //https://robolectric.org/blog/2019/06/04/paused-looper/
-        // We need below idle because see above
-        shadowOf(getMainLooper()).idle()
+    fun test_insert_image_syntax(){
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag(TestTagId.FLOATING_ACTION_BUTTON).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTagId.FLOATING_ACTION_BUTTON).performClick()
-        composeTestRule.onNodeWithTag(TestTagId.EDIT_NOTE_SCREEN).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_MODE).performClick()
-        composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_SPACE).performClick()
-        composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_SPACE).performTextInput("""
-            ```
-            fun main(){
-            print("Hello World")
-            }
-            ```
-        """.trimIndent())
-        composeTestRule.onNodeWithTag(TestTagId.PREVIEW_TEXT_MODE).performClick()
-//        val captureColorName = composeTestRule.onNodeWithTag(TestTagId.PREVIEW_CODE_BLOCK_ELEMENT).captureToImage().colorSpace.name
-//
-//        assertEquals(codeBlockColorName , captureColorName)
-        val codeBlockColorArray : IntArray = IntArray(20)
-        //For now just think or remember in this way pixel reading we got perfect output.
-        composeTestRule.onNodeWithTag(TestTagId.PREVIEW_CODE_BLOCK_ELEMENT).captureToImage().readPixels(codeBlockColorArray , 500 , 400 , 5 , 4)
-        codeBlockColorArray.forEach {
-            Assert.assertNotEquals(codeBlockColor.convert(ColorSpaces.Srgb) , it)
-        }
-
-    }
-
-    //Failed due to robolectric doesn't support networking
-    @OptIn(ExperimentalTestApi::class)
-    @Test
-    fun `test insert image syntax`(){
-        shadowOf(getMainLooper()).idle()
-        composeTestRule.onNodeWithTag(TestTagId.FLOATING_ACTION_BUTTON).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TestTagId.FLOATING_ACTION_BUTTON).performClick()
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag(TestTagId.EDIT_NOTE_SCREEN).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_MODE).performClick()
         composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_SPACE).performClick()

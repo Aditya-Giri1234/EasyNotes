@@ -34,7 +34,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.kin.easynotes.CustomTestRunner"
 
         // https://developer.android.com/guide/topics/resources/app-languages#gradle-config
         resourceConfigurations.plus(
@@ -142,13 +143,19 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.navigation.compose)
 
-    testImplementation(libs.junit)
+
+    androidTestImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.junit.ktx)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    testImplementation(libs.androidx.ui.test.junit4)
+
+    androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.test.manifest)
+    debugImplementation(libs.androidx.test.core)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.androidx.ui.test.junit4)
     // Optional -- Mockito framework
     testImplementation(libs.mockito.core)
     // Optional -- mockito-kotlin
