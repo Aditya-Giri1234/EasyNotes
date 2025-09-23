@@ -1,19 +1,21 @@
 package com.kin.easynotes.markdown_test
 
-import android.os.Looper.getMainLooper
 import androidx.activity.compose.setContent
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.testing.TestNavHostController
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.runner.AndroidJUnitRunner
+import com.kin.easynotes.CustomTestRunner
+import com.kin.easynotes.HiltComponentActivity
 import com.kin.easynotes.core.constant.TestTagId
 import com.kin.easynotes.data.repository.ImportExportRepository
 import com.kin.easynotes.domain.usecase.ImportExportUseCase
@@ -26,7 +28,6 @@ import com.kin.easynotes.presentation.navigation.NavRoutes
 import com.kin.easynotes.presentation.screens.settings.model.SettingsViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import dagger.hilt.android.testing.HiltTestApplication
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -39,7 +40,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
 
-@RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
 class LineProcessingTest {
     @get:Rule(order = 0)
@@ -63,12 +63,16 @@ class LineProcessingTest {
     @Inject
     lateinit var importExportUseCase: ImportExportUseCase
 
+    private lateinit var navController: TestNavHostController
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher) // Override Dispatchers.Main for testing coroutines
         hiltRule.inject() // Hilt injects dependencies
+        composeTestRule.mainClock.autoAdvance = true
+        navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+        navController.navigatorProvider.addNavigator(ComposeNavigator())
         settingsViewModel = SettingsViewModel(
             galleryObserver,
             backUp,
@@ -79,7 +83,7 @@ class LineProcessingTest {
         composeTestRule.activity.setContent {
             AppNavHost(
                 settingsModel = settingsViewModel,
-                rememberNavController(),
+                navController,
                 -1,
                 NavRoutes.Home.route
             )

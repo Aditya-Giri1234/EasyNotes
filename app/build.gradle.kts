@@ -86,6 +86,7 @@ android {
         unitTests {
             isIncludeAndroidResources = true
         }
+        animationsDisabled = true
     }
     buildToolsVersion = "34.0.0"
 
@@ -128,6 +129,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.navigation.testing)
     ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.android.compiler)
     ksp(libs.hilt.compile)
