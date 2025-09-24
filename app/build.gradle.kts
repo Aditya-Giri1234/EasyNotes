@@ -35,7 +35,7 @@ android {
             useSupportLibrary = true
         }
 //        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunner = "com.kin.easynotes.CustomTestRunner"
+        testInstrumentationRunner = "com.kin.easynotes.HiltTestRunner"
 
         // https://developer.android.com/guide/topics/resources/app-languages#gradle-config
         resourceConfigurations.plus(

@@ -1,6 +1,11 @@
 package com.kin.easynotes.markdown_test
 
 import androidx.activity.compose.setContent
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -14,7 +19,6 @@ import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.runner.AndroidJUnitRunner
-import com.kin.easynotes.CustomTestRunner
 import com.kin.easynotes.HiltComponentActivity
 import com.kin.easynotes.core.constant.TestTagId
 import com.kin.easynotes.data.repository.ImportExportRepository
@@ -26,6 +30,7 @@ import com.kin.easynotes.presentation.components.GalleryObserver
 import com.kin.easynotes.presentation.navigation.AppNavHost
 import com.kin.easynotes.presentation.navigation.NavRoutes
 import com.kin.easynotes.presentation.screens.settings.model.SettingsViewModel
+import com.kin.easynotes.presentation.theme.LeafNotesTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.Dispatchers
@@ -63,16 +68,12 @@ class LineProcessingTest {
     @Inject
     lateinit var importExportUseCase: ImportExportUseCase
 
-    private lateinit var navController: TestNavHostController
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setUp() {
-        Dispatchers.setMain(testDispatcher) // Override Dispatchers.Main for testing coroutines
+//        Dispatchers.setMain(testDispatcher) // Override Dispatchers.Main for testing coroutines
         hiltRule.inject() // Hilt injects dependencies
-        composeTestRule.mainClock.autoAdvance = true
-        navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        navController.navigatorProvider.addNavigator(ComposeNavigator())
+//        composeTestRule.mainClock.autoAdvance = true
         settingsViewModel = SettingsViewModel(
             galleryObserver,
             backUp,
@@ -81,27 +82,36 @@ class LineProcessingTest {
             importExportUseCase
         )
         composeTestRule.activity.setContent {
-            AppNavHost(
-                settingsModel = settingsViewModel,
-                navController,
-                -1,
-                NavRoutes.Home.route
-            )
+            val navController = rememberNavController()
+            LeafNotesTheme(settingsViewModel){
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    modifier = Modifier.semantics {
+                        testTagsAsResourceId = true
+                    }
+                ) {
+                    AppNavHost(
+                        settingsModel = settingsViewModel,
+                        navController,
+                        -1,
+                        NavRoutes.Home.route
+                    )
+                }
+            }
+
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @After
     fun tearDown(){
-        Dispatchers.resetMain() // Reset the dispatcher after tests
+//        Dispatchers.resetMain() // Reset the dispatcher after tests
     }
 
     @Test
     fun test_insert_image_syntax(){
-        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag(TestTagId.FLOATING_ACTION_BUTTON).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTagId.FLOATING_ACTION_BUTTON).performClick()
-        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag(TestTagId.EDIT_NOTE_SCREEN).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_MODE).performClick()
         composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_SPACE).performClick()
