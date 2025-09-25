@@ -117,11 +117,12 @@ class LineProcessingTest {
         composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_SPACE).performClick()
         composeTestRule.onNodeWithTag(TestTagId.EDIT_TEXT_SPACE).performTextInput("!(https://plus.unsplash.com/premium_photo-1757260019141-458516170c6c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8)")
         composeTestRule.onNodeWithTag(TestTagId.PREVIEW_TEXT_MODE).performClick()
-        val desiredNode = composeTestRule.onNodeWithContentDescription("(https://plus.unsplash.com/premium_photo-1757260019141-458516170c6c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8".hashCode().toString())
-        composeTestRule.waitUntil(5000) {
-            desiredNode.isDisplayed()
-        }
-        composeTestRule.onNodeWithTag("(https://plus.unsplash.com/premium_photo-1757260019141-458516170c6c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8".hashCode().toString() + "Success").assertIsDisplayed()
+        val desiredNode = composeTestRule.onNodeWithContentDescription("https://plus.unsplash.com/premium_photo-1757260019141-458516170c6c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8".hashCode().toString())
+//        composeTestRule.waitUntil(10000){
+//            desiredNode.isDisplayed()
+//        }
+        desiredNode.assertIsDisplayed()
+        composeTestRule.onNodeWithTag("https://plus.unsplash.com/premium_photo-1757260019141-458516170c6c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8".hashCode().toString() + "Success").assertIsDisplayed()
     }
 
 }

@@ -4,6 +4,7 @@ package com.kin.easynotes.presentation.components.markdown
 import android.content.Intent
 import android.net.Uri
 import android.text.SpannableString
+import android.util.Log
 import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,7 +28,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -308,13 +313,16 @@ fun RenderMarkdownElement(
                         .clip(shape = shapeManager(isBoth = true, radius = radius / 2))
                         .clickable { /* Just for animation */ }
                 }
-                var imageState : AsyncImagePainter.State = remember {
-                    AsyncImagePainter.State.Empty
+                var imageState : AsyncImagePainter.State by remember {
+                    //Must be a state so that our testTag can be dynamically change when state change.
+                    mutableStateOf( AsyncImagePainter.State.Empty)
                 }
                 AsyncImage(
                     model = element.photoUri,
                     contentDescription = element.photoUri.hashCode().toString(),
                     modifier = modifier.semantics {
+                        //https://medium.com/deuk/android-compose-tutorial-todo-app-with-ui-testing-af1a68db6925
+                        //Read this article semantic node section
                         testTag  = when(imageState){
                             is AsyncImagePainter.State.Success -> element.photoUri.hashCode().toString() + "Success"
                             else -> element.photoUri.hashCode().toString() + "Failed"
