@@ -2,16 +2,22 @@ package com.kin.easynotes.data.repository
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.IOException
 import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.preferencesOf
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.kin.easynotes.domain.repository.SettingsRepository
 import com.kin.easynotes.widget.NotesWidgetReceiver
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 
 private const val PREFERENCES_NAME = "settingsupdated"
@@ -25,6 +31,26 @@ class SettingsRepositoryImpl (private val context: Context) : SettingsRepository
     override suspend fun getPreferences(): Preferences {
         return context.dataStore.data.first()
     }
+
+    suspend fun <T> putData(key: Preferences.Key<T>, value : T) {
+        context.dataStore.edit { settings ->
+            settings[key] = value
+        }
+    }
+
+    suspend fun <T> getData(key: Preferences.Key<T> , defaultValue: T) : Flow<T> =
+        context.dataStore.data.catch {
+                exception ->
+            if (exception is IOException){
+                emit(emptyPreferences())
+            }else{
+                throw exception
+            }
+        }.map {preferences->
+            val result = preferences[key]?: defaultValue
+            result
+        }
+
 
     override suspend fun putString(key: String, value: String) {
         val preferencesKey = stringPreferencesKey(key)
