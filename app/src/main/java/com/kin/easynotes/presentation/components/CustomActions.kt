@@ -23,6 +23,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import com.kin.easynotes.core.constant.TestTagId
 
 @Composable
 fun CloseButton(
@@ -91,7 +93,7 @@ fun NavigationIcon(onBackNavClicked: () -> Unit) {
 
 @Composable
 fun SettingsButton(onSettingsClicked: () -> Unit) {
-    IconButton(onClick = onSettingsClicked) {
+    IconButton(onClick = onSettingsClicked , modifier = Modifier.testTag(TestTagId.SETTING_BUTTON)) {
         Icon(
             imageVector = Icons.Rounded.Settings,
             contentDescription = "Settings",

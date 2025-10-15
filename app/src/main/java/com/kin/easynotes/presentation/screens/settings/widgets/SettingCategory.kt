@@ -34,6 +34,7 @@ import com.kin.easynotes.presentation.theme.FontUtils
 
 @Composable
 fun SettingCategory(
+    modifier: Modifier = Modifier,
     title: String,
     subTitle: String = "",
     icon: ImageVector,
@@ -50,7 +51,7 @@ fun SettingCategory(
     ElevatedCard(
         shape = shape,
 
-        modifier = Modifier
+        modifier = modifier
             .clip(shape)
             .clickable {
                 showCustomAction = showCustomAction.not()

@@ -26,12 +26,14 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.kin.easynotes.R
 import com.kin.easynotes.core.constant.ConnectionConst
+import com.kin.easynotes.core.constant.TestTagId
 import com.kin.easynotes.presentation.components.NavigationIcon
 import com.kin.easynotes.presentation.components.NotesScaffold
 import com.kin.easynotes.presentation.components.TitleText
@@ -100,6 +102,7 @@ fun MainSettings(settingsViewModel: SettingsViewModel,navController: NavControll
             }
             item {
                 SettingCategory(
+                    modifier = Modifier.testTag(TestTagId.COLORS_STYLES),
                     title = stringResource(id = R.string.color_styles),
                     subTitle = stringResource(R.string.description_color_styles),
                     icon = Icons.Rounded.Palette,

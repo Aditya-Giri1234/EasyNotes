@@ -80,6 +80,7 @@ enum class ActionType {
 
 @Composable
 fun SettingsBox(
+    modifier: Modifier  = Modifier,
     radius: RoundedCornerShape? = null,
     title: String,
     description: String? = null,
@@ -103,7 +104,7 @@ fun SettingsBox(
 
     AnimatedVisibility(visible = isEnabled) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .padding(bottom = dimensionResource(id = R.dimen.card_padding_bottom))
                 .clip(radius ?: RoundedCornerShape(13.dp))
                 .background(MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp))

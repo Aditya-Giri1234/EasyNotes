@@ -44,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -55,6 +56,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.core.os.LocaleListCompat
 import androidx.navigation.NavController
 import com.kin.easynotes.R
+import com.kin.easynotes.core.constant.TestTagId
 import com.kin.easynotes.presentation.screens.settings.SettingsScaffold
 import com.kin.easynotes.presentation.screens.settings.model.SettingsViewModel
 import com.kin.easynotes.presentation.screens.settings.widgets.ActionType
@@ -83,6 +85,7 @@ fun ColorStylesScreen(navController: NavController, settingsViewModel: SettingsV
         LazyColumn {
             item {
                 SettingsBox(
+                    modifier = Modifier.testTag(TestTagId.ENABLED_DISABLED_MINIMALISTIC_MODE),
                     settingsViewModel = settingsViewModel,
                     title = stringResource(id = R.string.minimalistic_mode),
                     description = stringResource(id = R.string.minimalistic_mode_description),

@@ -8,4 +8,7 @@ object TestTagId{
     const val EDIT_TEXT_SPACE = "edit_text_space"
     const val PREVIEW_TEXT_SPACE = "preview_text_space"
     const val PREVIEW_CODE_BLOCK_ELEMENT = "preview_code_block_element"
+    const val SETTING_BUTTON = "setting_button"
+    const val COLORS_STYLES = "color_style"
+    const val ENABLED_DISABLED_MINIMALISTIC_MODE = "enabled_disabled_minimalistic_mode"
 }
